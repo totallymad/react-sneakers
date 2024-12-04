@@ -1,24 +1,33 @@
+import { useState } from "react";
 import styles from "./Card.module.scss";
 
-console.log(styles);
-
 // eslint-disable-next-line react/prop-types
-export default function Card({ title, price, imgUrl, onClick }) {
+export default function Card({ name, price, imgUrl, onClick }) {
+  const [isAdded, setIsAdded] = useState(false);
+
+  function handleClickPlus() {
+    onClick({ name, price, imgUrl });
+    setIsAdded((prevState) => !prevState);
+  }
+
   return (
     <div className={styles.card}>
       <div className={styles.favorite}>
         <img src="/img/heart-unliked.svg" alt="unliked" />
       </div>
       <img width={133} height={112} src={imgUrl} alt="sneakers" />
-      <h5>{title}</h5>
+      <h5>{name}</h5>
       <div className="d-flex justify-between align-center">
         <div className="d-flex flex-column">
           <span>Цена:</span>
           <b>{price} руб.</b>
         </div>
-        <button className="button" onClick={onClick}>
-          <img width={11} height={11} src="/img/plus.svg" />
-        </button>
+        <img
+          className={styles.plus}
+          onClick={handleClickPlus}
+          src={!isAdded ? "/img/btn-plus.svg" : "/img/btn-checked.svg"}
+          alt="plus"
+        />
       </div>
     </div>
   );

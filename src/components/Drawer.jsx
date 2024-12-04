@@ -1,10 +1,12 @@
-export default function Drawer() {
+// eslint-disable-next-line react/prop-types
+export default function Drawer({ onClose, onDelete, items = [] }) {
   return (
-    <div style={{ display: "none" }} className="overlay">
+    <div className="overlay">
       <div className="drawer">
         <h2 className="d-flex justify-between mb-30 ">
           Корзина
           <img
+            onClick={onClose}
             className="removeBtn cu-p"
             src="/img/btn-remove.svg"
             alt="remove"
@@ -12,28 +14,26 @@ export default function Drawer() {
         </h2>
 
         <div className="items flex">
-          <div className="cartItem d-flex align-center mb-20">
-            <div
-              style={{ backgroundImage: "url(/img/sneakers/1.jpg)" }}
-              className="cartItemImg"
-            ></div>
-            <div className="mr-20 flex">
-              <p className="mb-5">Мужские Кроссовки Nike Air Max 270</p>
-              <b>12 999 руб.</b>
-            </div>
-            <img className="removeBtn" src="/img/btn-remove.svg" alt="remove" />
-          </div>
-          <div className="cartItem d-flex align-center mb-20">
-            <div
-              style={{ backgroundImage: "url(/img/sneakers/1.jpg)" }}
-              className="cartItemImg"
-            ></div>
-            <div className="mr-20 flex ">
-              <p className="mb-5">Мужские Кроссовки Nike Air Max 270</p>
-              <b>12 999 руб.</b>
-            </div>
-            <img className="removeBtn" src="/img/btn-remove.svg" alt="remove" />
-          </div>
+          {items.map((item, index) => {
+            return (
+              <div key={index} className="cartItem d-flex align-center mb-20">
+                <div
+                  style={{ backgroundImage: `url(${item.imgUrl})` }}
+                  className="cartItemImg"
+                ></div>
+                <div className="mr-20 flex">
+                  <p className="mb-5">{item.name}</p>
+                  <b>{item.price} руб.</b>
+                </div>
+                <img
+                  onClick={() => onDelete(item)}
+                  className="removeBtn"
+                  src="/img/btn-remove.svg"
+                  alt="remove"
+                />
+              </div>
+            );
+          })}
         </div>
 
         <div className="cartTotalBlock">
