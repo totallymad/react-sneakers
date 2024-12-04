@@ -2,18 +2,28 @@ import { useState } from "react";
 import styles from "./Card.module.scss";
 
 // eslint-disable-next-line react/prop-types
-export default function Card({ name, price, imgUrl, onClick }) {
+export default function Card({ name, price, imgUrl, onClick, onFavorite }) {
   const [isAdded, setIsAdded] = useState(false);
+  const [isFavorite, setisFavorite] = useState(false);
 
   function handleClickPlus() {
     onClick({ name, price, imgUrl });
     setIsAdded((prevState) => !prevState);
   }
 
+  function handleFavorite() {
+    onFavorite({ name, price, imgUrl });
+    setisFavorite((prev) => !prev);
+  }
+
   return (
     <div className={styles.card}>
       <div className={styles.favorite}>
-        <img src="/img/heart-unliked.svg" alt="unliked" />
+        <img
+          onClick={handleFavorite}
+          src={isFavorite ? "/img/heart-liked.svg" : "/img/heart-unliked.svg"}
+          alt="unliked"
+        />
       </div>
       <img width={133} height={112} src={imgUrl} alt="sneakers" />
       <h5>{name}</h5>
