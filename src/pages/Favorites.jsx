@@ -1,8 +1,11 @@
+import { useContext } from "react";
 import Card from "../components/Card/Card";
+import AppContext from "../context";
 
 /* eslint-disable react/prop-types */
-export default function Favorites({ items, onAddFavorite, onAddToCart }) {
-  console.log(items);
+export default function Favorites({ onAddFavorite, onAddToCart }) {
+  const { items } = useContext(AppContext);
+
   return (
     <>
       <div className="content p-40">
@@ -20,7 +23,7 @@ export default function Favorites({ items, onAddFavorite, onAddToCart }) {
                 name={card.name}
                 price={card.price}
                 imgUrl={card.imgUrl}
-                favorited={card.isFavorite}
+                isFavorite={card.isFavorite}
                 isOnCart={card.isOnCart}
                 onFavorite={(obj) => onAddFavorite(obj)}
                 onClick={(obj) => onAddToCart(obj)}

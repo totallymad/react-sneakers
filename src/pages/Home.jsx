@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
+import { useContext } from "react";
 import Card from "../components/Card/Card";
+import AppContext from "../context";
 
 export default function Home({
-  items,
   searchValue,
   setSearchValue,
   onChangeSearchInput,
@@ -10,6 +11,8 @@ export default function Home({
   onAddToCart,
   isLoading,
 }) {
+  const { items } = useContext(AppContext);
+
   function renderItems() {
     const filteredItems = items.filter((item) =>
       item.name.toLowerCase().includes(searchValue.toLowerCase())
@@ -23,7 +26,7 @@ export default function Home({
             name={card.name}
             price={card.price}
             imgUrl={card.imgUrl}
-            favorited={card.isFavorite}
+            isFavorite={card.isFavorite}
             isOnCart={card.isOnCart}
             onFavorite={(obj) => onAddFavorite(obj)}
             onClick={(obj) => onAddToCart(obj)}

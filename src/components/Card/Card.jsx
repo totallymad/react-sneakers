@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+// import { useState } from "react";
 import ContentLoader from "react-content-loader";
 import styles from "./Card.module.scss";
 
@@ -10,12 +10,12 @@ export default function Card({
   imgUrl,
   onFavorite,
   onClick,
-  favorited,
+  isFavorite,
   isOnCart,
   isLoading,
 }) {
   // const [isAdded, setIsAdded] = useState(isOnCart);
-  const [isFavorite, setIsFavorite] = useState(favorited);
+  // const [isFavorite, setIsFavorite] = useState(favorited);
 
   async function handleClickPlus() {
     // Передаем объект для обработки
@@ -26,7 +26,7 @@ export default function Card({
     // Передаем объект для обработки
     await onFavorite({ id, name, price, imgUrl, isFavorite });
     // Локальное переключение состояния
-    setIsFavorite((prev) => !prev);
+    // setIsFavorite((prev) => !prev);
   }
 
   return (
