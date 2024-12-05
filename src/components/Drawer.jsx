@@ -14,26 +14,31 @@ export default function Drawer({ onClose, onDelete, items = [] }) {
         </h2>
 
         <div className="items flex">
-          {items.map((item, index) => {
-            return (
-              <div key={index} className="cartItem d-flex align-center mb-20">
+          {items
+            .filter((item) => item.isOnCart)
+            .map((item) => {
+              return (
                 <div
-                  style={{ backgroundImage: `url(${item.imgUrl})` }}
-                  className="cartItemImg"
-                ></div>
-                <div className="mr-20 flex">
-                  <p className="mb-5">{item.name}</p>
-                  <b>{item.price} руб.</b>
+                  key={item.id}
+                  className="cartItem d-flex align-center mb-20"
+                >
+                  <div
+                    style={{ backgroundImage: `url(${item.imgUrl})` }}
+                    className="cartItemImg"
+                  ></div>
+                  <div className="mr-20 flex">
+                    <p className="mb-5">{item.name}</p>
+                    <b>{item.price} руб.</b>
+                  </div>
+                  <img
+                    onClick={() => onDelete(item)}
+                    className="removeBtn"
+                    src="/img/btn-remove.svg"
+                    alt="remove"
+                  />
                 </div>
-                <img
-                  onClick={() => onDelete(item.id)}
-                  className="removeBtn"
-                  src="/img/btn-remove.svg"
-                  alt="remove"
-                />
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
 
         <div className="cartTotalBlock">

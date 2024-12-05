@@ -1,69 +1,6 @@
-// /* eslint-disable react/prop-types */
-// import { useState, useEffect } from "react";
-// import styles from "./Card.module.scss";
-
-// export default function Card({
-//   id,
-//   name,
-//   price,
-//   imgUrl,
-//   onFavorite,
-//   onClick,
-//   favorited,
-//   isOnCart,
-// }) {
-//   const [isAdded, setIsAdded] = useState(isOnCart);
-//   const [isFavorite, setIsFavorite] = useState(favorited);
-
-//   useEffect(() => {
-//     // Обновляем локальное состояние, если пропсы изменились
-//     setIsAdded(isOnCart);
-//     setIsFavorite(favorited);
-//   }, [isOnCart, favorited]);
-
-//   async function handleClickPlus() {
-//     // Передаем объект для обработки
-//     await onClick({ id, name, price, imgUrl, isOnCart: isAdded });
-//     // Локальное переключение состояния
-//     setIsAdded((prev) => !prev);
-//   }
-
-//   async function handleFavorite() {
-//     // Передаем объект для обработки
-//     await onFavorite({ id, name, price, imgUrl, isFavorite });
-//     // Локальное переключение состояния
-//     setIsFavorite((prev) => !prev);
-//   }
-
-//   return (
-//     <div className={styles.card}>
-//       <div className={styles.favorite}>
-//         <img
-//           onClick={handleFavorite}
-//           src={isFavorite ? "/img/heart-liked.svg" : "/img/heart-unliked.svg"}
-//           alt={isFavorite ? "liked" : "unliked"}
-//         />
-//       </div>
-//       <img width={133} height={112} src={imgUrl} alt="sneakers" />
-//       <h5>{name}</h5>
-//       <div className="d-flex justify-between align-center">
-//         <div className="d-flex flex-column">
-//           <span>Цена:</span>
-//           <b>{price} руб.</b>
-//         </div>
-//         <img
-//           className={styles.plus}
-//           onClick={handleClickPlus}
-//           src={!isAdded ? "/img/btn-plus.svg" : "/img/btn-checked.svg"}
-//           alt="plus"
-//         />
-//       </div>
-//     </div>
-//   );
-// }
-
 /* eslint-disable react/prop-types */
 import { useState } from "react";
+import ContentLoader from "react-content-loader";
 import styles from "./Card.module.scss";
 
 export default function Card({
@@ -75,7 +12,9 @@ export default function Card({
   onClick,
   favorited,
   isOnCart,
+  isLoading,
 }) {
+  // const [isAdded, setIsAdded] = useState(isOnCart);
   const [isFavorite, setIsFavorite] = useState(favorited);
 
   async function handleClickPlus() {
@@ -92,27 +31,48 @@ export default function Card({
 
   return (
     <div className={styles.card}>
-      <div className={styles.favorite}>
-        <img
-          onClick={handleFavorite}
-          src={isFavorite ? "/img/heart-liked.svg" : "/img/heart-unliked.svg"}
-          alt={isFavorite ? "liked" : "unliked"}
-        />
-      </div>
-      <img width={133} height={112} src={imgUrl} alt="sneakers" />
-      <h5>{name}</h5>
-      <div className="d-flex justify-between align-center">
-        <div className="d-flex flex-column">
-          <span>Цена:</span>
-          <b>{price} руб.</b>
-        </div>
-        <img
-          className={styles.plus}
-          onClick={handleClickPlus}
-          src={!isOnCart ? "/img/btn-plus.svg" : "/img/btn-checked.svg"}
-          alt="plus"
-        />
-      </div>
+      {isLoading ? (
+        <ContentLoader
+          speed={2}
+          width={175}
+          height={245}
+          viewBox="0 0 150 187"
+          backgroundColor="#f2f2f2"
+          foregroundColor="#d1d1d1"
+        >
+          <rect x="0" y="0" rx="3" ry="3" width="150" height="90" />
+          <rect x="0" y="100" rx="3" ry="3" width="150" height="15" />
+          <rect x="0" y="123" rx="3" ry="3" width="93" height="15" />
+          <rect x="0" y="155" rx="8" ry="8" width="80" height="24" />
+          <rect x="117" y="149" rx="8" ry="8" width="32" height="32" />
+        </ContentLoader>
+      ) : (
+        <>
+          <div className={styles.favorite}>
+            <img
+              onClick={handleFavorite}
+              src={
+                isFavorite ? "/img/heart-liked.svg" : "/img/heart-unliked.svg"
+              }
+              alt={isFavorite ? "liked" : "unliked"}
+            />
+          </div>
+          <img width={133} height={112} src={imgUrl} alt="sneakers" />
+          <h5>{name}</h5>
+          <div className="d-flex justify-between align-center">
+            <div className="d-flex flex-column">
+              <span>Цена:</span>
+              <b>{price} руб.</b>
+            </div>
+            <img
+              className={styles.plus}
+              onClick={handleClickPlus}
+              src={!isOnCart ? "/img/btn-plus.svg" : "/img/btn-checked.svg"}
+              alt={isOnCart ? "checked" : "plus"}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

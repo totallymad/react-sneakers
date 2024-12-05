@@ -1,7 +1,7 @@
 import Card from "../components/Card/Card";
 
 /* eslint-disable react/prop-types */
-export default function Favorites({ items, onAddFavorite }) {
+export default function Favorites({ items, onAddFavorite, onAddToCart }) {
   console.log(items);
   return (
     <>
@@ -15,13 +15,15 @@ export default function Favorites({ items, onAddFavorite }) {
             .filter((item) => item.isFavorite)
             .map((card) => (
               <Card
-                id={card.id}
                 key={card.id}
+                id={card.id}
                 name={card.name}
                 price={card.price}
                 imgUrl={card.imgUrl}
                 favorited={card.isFavorite}
-                onFavorite={onAddFavorite}
+                isOnCart={card.isOnCart}
+                onFavorite={(obj) => onAddFavorite(obj)}
+                onClick={(obj) => onAddToCart(obj)}
               />
             ))}
         </div>

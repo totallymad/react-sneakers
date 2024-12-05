@@ -10,16 +10,23 @@ import Favorites from "./pages/Favorites";
 function App() {
   const [items, setItems] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [cartItems, setCartItems] = useState([]);
   const [cartOpened, setCartOpened] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    axios("https://6750184969dc1669ec19a427.mockapi.io/Items").then((res) => {
-      setItems(res.data);
-    });
-    axios("https://6750184969dc1669ec19a427.mockapi.io/cart").then((res) => {
-      setCartItems(res.data);
-    });
+    async function fetchData() {
+      // setIsLoading(true);
+      const resp = await axios(
+        "https://6750184969dc1669ec19a427.mockapi.io/Items"
+      );
+      setIsLoading(false);
+      setItems(resp.data);
+    }
+
+    fetchData();
+    // axios("https://6750184969dc1669ec19a427.mockapi.io/Items").then((res) => {
+    //   setItems(res.data);
+    // });
   }, []);
 
   function handleOpenDrawen() {
@@ -32,50 +39,22 @@ function App() {
 
   // Добавление в корзину
   async function handleAddOnCart(obj) {
+    console.log("Объект для изменения:", obj);
+
+    // Локальное обновление состояния items
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === obj.id ? { ...item, isOnCart: !item.isOnCart } : item
+      )
+    );
+
+    // Синхронизация с MockAPI
     try {
-      // Проверка, есть ли объект в корзине
-      const itemInCart = cartItems.find((item) => item.id === obj.id);
-
-      if (itemInCart) {
-        // Удаление из корзины
-        await axios.delete(
-          `https://6750184969dc1669ec19a427.mockapi.io/cart/${obj.id}`
-        );
-        setCartItems((prev) => prev.filter((item) => item.id !== obj.id));
-
-        // Обновление состояния в items
-        setItems((prev) =>
-          prev.map((item) =>
-            item.id === obj.id ? { ...item, isOnCart: false } : item
-          )
-        );
-
-        // Синхронизация с сервером (Items)
-        await axios.put(
-          `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
-          { isOnCart: false }
-        );
-      } else {
-        // Добавление в корзину
-        const response = await axios.post(
-          "https://6750184969dc1669ec19a427.mockapi.io/cart",
-          obj
-        );
-        setCartItems((prev) => [...prev, response.data]);
-
-        // Обновление состояния в items
-        setItems((prev) =>
-          prev.map((item) =>
-            item.id === obj.id ? { ...item, isOnCart: true } : item
-          )
-        );
-
-        // Синхронизация с сервером (Items)
-        await axios.put(
-          `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
-          { isOnCart: true }
-        );
-      }
+      const response = await axios.put(
+        `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
+        { isOnCart: !obj.isOnCart } // Переключение статуса
+      );
+      console.log("Обновление на сервере успешно:", response.data);
     } catch (error) {
       console.error("Ошибка синхронизации с сервером:", error);
     }
@@ -105,32 +84,25 @@ function App() {
   }
 
   // удаление из корзины
-  async function handleDeleteFromCart(id) {
+  async function handleDeleteFromCart(obj) {
+    console.log("Объект для удаления из корзины:", obj);
+
+    // Локальное обновление состояния items
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === obj.id ? { ...item, isOnCart: false } : item
+      )
+    );
+
+    // Синхронизация с MockAPI
     try {
-      // Удаление из корзины
-      await axios.delete(
-        `https://6750184969dc1669ec19a427.mockapi.io/cart/${id}`
+      const response = await axios.put(
+        `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
+        { isOnCart: !obj.isOnCart } // Переключение статуса
       );
-
-      // Удаление из локального состояния корзины
-      setCartItems((prevCartItems) =>
-        prevCartItems.filter((item) => item.id !== id)
-      );
-
-      // Обновление состояния в items
-      setItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === id ? { ...item, isOnCart: false } : item
-        )
-      );
-
-      // Синхронизация с MockAPI (обновление isOnCart)
-      await axios.put(
-        `https://6750184969dc1669ec19a427.mockapi.io/Items/${id}`,
-        { isOnCart: false }
-      );
+      console.log("Обновление на сервере успешно:", response.data);
     } catch (error) {
-      console.error("Ошибка при удалении из корзины:", error);
+      console.error("Ошибка синхронизации с сервером:", error);
     }
   }
 
@@ -144,7 +116,7 @@ function App() {
         {cartOpened && (
           <Drawer
             onClose={handleCloseDrawen}
-            items={cartItems}
+            items={items}
             onDelete={handleDeleteFromCart}
           />
         )}
@@ -160,13 +132,20 @@ function App() {
                 onChangeSearchInput={onChangeSearch}
                 onAddFavorite={handleFavorite}
                 onAddToCart={handleAddOnCart}
+                isLoading={isLoading}
               />
             }
             exact
           />
           <Route
             path="/favorites"
-            element={<Favorites items={items} onAddFavorite={handleFavorite} />}
+            element={
+              <Favorites
+                items={items}
+                onAddFavorite={handleFavorite}
+                onAddToCart={handleAddOnCart}
+              />
+            }
             exact
           />
         </Routes>
