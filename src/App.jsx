@@ -5,6 +5,7 @@ import Drawer from "./components/Drawer";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import axios from "axios";
+import Favorites from "./pages/Favorites";
 
 function App() {
   const [items, setItems] = useState([]);
@@ -12,6 +13,9 @@ function App() {
   const [searchValue, setSearchValue] = useState("");
   const [cartItems, setCartItems] = useState([]);
   const [cartOpened, setCartOpened] = useState(false);
+
+  console.log(favorites);
+  console.log(items);
 
   useEffect(() => {
     axios("https://6750184969dc1669ec19a427.mockapi.io/Items").then((res) => {
@@ -22,7 +26,6 @@ function App() {
     });
     const storedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
     setFavorites(storedFavorites);
-    console.log(storedFavorites);
   }, []);
 
   function handleOpenDrawen() {
@@ -38,16 +41,62 @@ function App() {
     setCartItems((prev) => [...prev, obj]);
   }
 
-  function handleFavorite(obj) {
-    console.log(obj);
-    setFavorites((prev) => {
-      const updatedFavorites = [...prev, obj];
+  // function handleFavorite(obj) {
+  //   console.log(obj);
+  //   setFavorites((prev) => {
+  //     // Проверяем, существует ли объект с таким же id
+  //     const exists = prev.some((item) => item.id === obj.id);
 
-      // Сохранение обновленного массива в LocalStorage
-      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+  //     // Если объект уже есть, удаляем его, иначе добавляем
+  //     const updatedFavorites = exists
+  //       ? prev.filter((item) => item.id !== obj.id) // Удаляем объект
+  //       : [...prev, obj]; // Добавляем новый объект
 
-      return updatedFavorites; // Возвращаем обновленный массив
+  //     // Сохранение обновленного массива в LocalStorage
+  //     localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+
+  //     return updatedFavorites; // Возвращаем обновленный массив
+  //   });
+  // }
+
+  async function handleFavorite(obj) {
+    console.log("Объект для изменения:", obj);
+
+    // Локальное обновление состояния
+    setItems((prev) => {
+      // Обновляем параметр isFavorite
+      const updatedItems = prev.map((item) =>
+        item.id === obj.id ? { ...item, isFavorite: !item.isFavorite } : item
+      );
+
+      console.log("Обновленный массив items:", updatedItems);
+
+      // Возвращаем обновленный массив для состояния
+      return updatedItems;
     });
+
+    // Синхронизация с MockAPI
+    try {
+      const response = await fetch(
+        `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isFavorite: !obj.isFavorite }), // Обновляем только isFavorite
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Ошибка обновления: ${response.statusText}`);
+      }
+
+      const updatedItem = await response.json();
+      console.log("Обновление на сервере успешно:", updatedItem);
+    } catch (error) {
+      console.error("Ошибка синхронизации с сервером:", error);
+    }
   }
 
   function handleDeleteFromCart(id) {
@@ -84,6 +133,13 @@ function App() {
                 onAddFavorite={handleFavorite}
                 onAddToCart={handleAddOnCart}
               />
+            }
+            exact
+          />
+          <Route
+            path="/favorites"
+            element={
+              <Favorites items={favorites} onAddFavorite={handleFavorite} />
             }
             exact
           />

@@ -37,9 +37,12 @@ export default function Home({
 
         <div className="d-flex flex-wrap">
           {items
-            .filter((item) => item.name.toLowerCase().includes(searchValue))
+            .filter((item) =>
+              item.name.toLowerCase().includes(searchValue.toLowerCase())
+            )
             .map((card, index) => (
               <Card
+                id={card.id}
                 key={index}
                 name={card.name}
                 price={card.price}

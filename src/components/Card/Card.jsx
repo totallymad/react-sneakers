@@ -1,10 +1,18 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import styles from "./Card.module.scss";
 
-// eslint-disable-next-line react/prop-types
-export default function Card({ name, price, imgUrl, onClick, onFavorite }) {
+export default function Card({
+  id,
+  name,
+  price,
+  imgUrl,
+  onClick,
+  onFavorite,
+  favorited = false,
+}) {
   const [isAdded, setIsAdded] = useState(false);
-  const [isFavorite, setisFavorite] = useState(false);
+  const [isFavorite, setisFavorite] = useState(favorited);
 
   function handleClickPlus() {
     onClick({ name, price, imgUrl });
@@ -12,7 +20,7 @@ export default function Card({ name, price, imgUrl, onClick, onFavorite }) {
   }
 
   function handleFavorite() {
-    onFavorite({ name, price, imgUrl });
+    onFavorite({ id, name, price, imgUrl });
     setisFavorite((prev) => !prev);
   }
 
