@@ -40,15 +40,17 @@ export default function Home({
             .filter((item) =>
               item.name.toLowerCase().includes(searchValue.toLowerCase())
             )
-            .map((card, index) => (
+            .map((card) => (
               <Card
+                key={card.id}
                 id={card.id}
-                key={index}
                 name={card.name}
                 price={card.price}
                 imgUrl={card.imgUrl}
-                onClick={(obj) => onAddToCart(obj)}
+                favorited={card.isFavorite}
+                isOnCart={card.isOnCart}
                 onFavorite={(obj) => onAddFavorite(obj)}
+                onClick={(obj) => onAddToCart(obj)}
               />
             ))}
         </div>

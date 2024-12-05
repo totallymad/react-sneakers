@@ -9,13 +9,9 @@ import Favorites from "./pages/Favorites";
 
 function App() {
   const [items, setItems] = useState([]);
-  const [favorites, setFavorites] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [cartItems, setCartItems] = useState([]);
   const [cartOpened, setCartOpened] = useState(false);
-
-  console.log(favorites);
-  console.log(items);
 
   useEffect(() => {
     axios("https://6750184969dc1669ec19a427.mockapi.io/Items").then((res) => {
@@ -24,8 +20,6 @@ function App() {
     axios("https://6750184969dc1669ec19a427.mockapi.io/cart").then((res) => {
       setCartItems(res.data);
     });
-    const storedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    setFavorites(storedFavorites);
   }, []);
 
   function handleOpenDrawen() {
@@ -36,74 +30,108 @@ function App() {
     setCartOpened(false);
   }
 
-  function handleAddOnCart(obj) {
-    axios.post("https://6750184969dc1669ec19a427.mockapi.io/cart", obj);
-    setCartItems((prev) => [...prev, obj]);
-  }
-
-  // function handleFavorite(obj) {
-  //   console.log(obj);
-  //   setFavorites((prev) => {
-  //     // Проверяем, существует ли объект с таким же id
-  //     const exists = prev.some((item) => item.id === obj.id);
-
-  //     // Если объект уже есть, удаляем его, иначе добавляем
-  //     const updatedFavorites = exists
-  //       ? prev.filter((item) => item.id !== obj.id) // Удаляем объект
-  //       : [...prev, obj]; // Добавляем новый объект
-
-  //     // Сохранение обновленного массива в LocalStorage
-  //     localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-
-  //     return updatedFavorites; // Возвращаем обновленный массив
-  //   });
-  // }
-
-  async function handleFavorite(obj) {
-    console.log("Объект для изменения:", obj);
-
-    // Локальное обновление состояния
-    setItems((prev) => {
-      // Обновляем параметр isFavorite
-      const updatedItems = prev.map((item) =>
-        item.id === obj.id ? { ...item, isFavorite: !item.isFavorite } : item
-      );
-
-      console.log("Обновленный массив items:", updatedItems);
-
-      // Возвращаем обновленный массив для состояния
-      return updatedItems;
-    });
-
-    // Синхронизация с MockAPI
+  // Добавление в корзину
+  async function handleAddOnCart(obj) {
     try {
-      const response = await fetch(
-        `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ isFavorite: !obj.isFavorite }), // Обновляем только isFavorite
-        }
-      );
+      // Проверка, есть ли объект в корзине
+      const itemInCart = cartItems.find((item) => item.id === obj.id);
 
-      if (!response.ok) {
-        throw new Error(`Ошибка обновления: ${response.statusText}`);
+      if (itemInCart) {
+        // Удаление из корзины
+        await axios.delete(
+          `https://6750184969dc1669ec19a427.mockapi.io/cart/${obj.id}`
+        );
+        setCartItems((prev) => prev.filter((item) => item.id !== obj.id));
+
+        // Обновление состояния в items
+        setItems((prev) =>
+          prev.map((item) =>
+            item.id === obj.id ? { ...item, isOnCart: false } : item
+          )
+        );
+
+        // Синхронизация с сервером (Items)
+        await axios.put(
+          `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
+          { isOnCart: false }
+        );
+      } else {
+        // Добавление в корзину
+        const response = await axios.post(
+          "https://6750184969dc1669ec19a427.mockapi.io/cart",
+          obj
+        );
+        setCartItems((prev) => [...prev, response.data]);
+
+        // Обновление состояния в items
+        setItems((prev) =>
+          prev.map((item) =>
+            item.id === obj.id ? { ...item, isOnCart: true } : item
+          )
+        );
+
+        // Синхронизация с сервером (Items)
+        await axios.put(
+          `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
+          { isOnCart: true }
+        );
       }
-
-      const updatedItem = await response.json();
-      console.log("Обновление на сервере успешно:", updatedItem);
     } catch (error) {
       console.error("Ошибка синхронизации с сервером:", error);
     }
   }
 
-  function handleDeleteFromCart(id) {
-    axios.delete(`https://6750184969dc1669ec19a427.mockapi.io/cart/${id}`);
-    setCartItems((prevCartItems) => {
-      return prevCartItems.filter((item) => item.id !== id);
-    });
+  //Добавление в избранное
+  async function handleFavorite(obj) {
+    console.log("Объект для изменения:", obj);
+
+    // Локальное обновление состояния items
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === obj.id ? { ...item, isFavorite: !item.isFavorite } : item
+      )
+    );
+
+    // Синхронизация с MockAPI
+    try {
+      const response = await axios.put(
+        `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
+        { isFavorite: !obj.isFavorite } // Переключение статуса
+      );
+      console.log("Обновление на сервере успешно:", response.data);
+    } catch (error) {
+      console.error("Ошибка синхронизации с сервером:", error);
+    }
+  }
+
+  // удаление из корзины
+  async function handleDeleteFromCart(id) {
+    try {
+      // Удаление из корзины
+      await axios.delete(
+        `https://6750184969dc1669ec19a427.mockapi.io/cart/${id}`
+      );
+
+      // Удаление из локального состояния корзины
+      setCartItems((prevCartItems) =>
+        prevCartItems.filter((item) => item.id !== id)
+      );
+
+      // Обновление состояния в items
+      setItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === id ? { ...item, isOnCart: false } : item
+        )
+      );
+
+      // Синхронизация с MockAPI (обновление isOnCart)
+      await axios.put(
+        `https://6750184969dc1669ec19a427.mockapi.io/Items/${id}`,
+        { isOnCart: false }
+      );
+    } catch (error) {
+      console.error("Ошибка при удалении из корзины:", error);
+    }
   }
 
   function onChangeSearch(e) {
@@ -138,9 +166,7 @@ function App() {
           />
           <Route
             path="/favorites"
-            element={
-              <Favorites items={favorites} onAddFavorite={handleFavorite} />
-            }
+            element={<Favorites items={items} onAddFavorite={handleFavorite} />}
             exact
           />
         </Routes>

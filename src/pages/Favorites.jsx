@@ -11,17 +11,19 @@ export default function Favorites({ items, onAddFavorite }) {
         </div>
 
         <div className="d-flex flex-wrap">
-          {items.map((card, index) => (
-            <Card
-              id={card.id}
-              key={index}
-              name={card.name}
-              price={card.price}
-              imgUrl={card.imgUrl}
-              favorited={true}
-              onFavorite={onAddFavorite}
-            />
-          ))}
+          {items
+            .filter((item) => item.isFavorite)
+            .map((card) => (
+              <Card
+                id={card.id}
+                key={card.id}
+                name={card.name}
+                price={card.price}
+                imgUrl={card.imgUrl}
+                favorited={card.isFavorite}
+                onFavorite={onAddFavorite}
+              />
+            ))}
         </div>
       </div>
     </>
