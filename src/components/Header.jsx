@@ -9,7 +9,7 @@ export default function Header({ onClickCart }) {
     <header className="d-flex justify-between align-center p-40">
       <Link to="/">
         <div className="d-flex align-center">
-          <img width={40} height={40} src="/img/logo.png" />
+          <img className="logo" width={60} height={60} src="/img/logo.png" />
           <div>
             <h3 className="text-uppercase">React Sneakers</h3>
             <p className="opacity-5">Магазин лучших кросовок</p>

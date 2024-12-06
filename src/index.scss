@@ -1,11 +1,13 @@
 body {
     margin: 0;
     font-family: 'Inter', system-ui;
-    background: #e7f6ff;
+    background: linear-gradient(342deg, rgba(255,255,255,1) 0%, rgb(255, 183, 132) 100%);
+    background-repeat: no-repeat;
+    min-height: 100vh;
 }
 
 * {
-    font-family: 'Inter', system-ui;
+    font-family: 'Montserrat', system-ui;
 }
 
 .wrapper {
@@ -27,8 +29,80 @@ header {
     p {
         margin: 0;
     }
+    .logo {
+        border-radius: 100%;
 
+    }
 }
+
+.slider {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    overflow: hidden;
+  }
+
+  .slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 300px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .slide:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .slide-content {
+    max-width: 80%;
+  }
+  
+  .slide-title {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .slide-descr {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  
+  .slider-btn.prev {
+    left: 10px;
+  }
+  
+  .slider-btn.next {
+    right: 10px;
+  }
+  
 
 .content {
     h1 {
@@ -48,6 +122,11 @@ header {
         font-size: 16px;
         width: 200px;
     }
+}
+
+.card-wrapper {
+    gap: 30px;
+    justify-content: center;
 }
 
 .clear-input {

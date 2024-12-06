@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
 import Orders from "./pages/Orders";
 import AppContext from "./context";
+import Slider from "./components/Slider";
 
 import axios from "axios";
 
@@ -138,6 +139,12 @@ function App() {
     setSearchValue(e.target.value);
   }
 
+  const slides = [
+    { title: "Stan Smith", descr: "Описание для Stan Smith" },
+    { title: "Kermit", descr: "Описание для Kermit" },
+    { title: "Huina", descr: "Описание для Huina" },
+  ];
+
   return (
     <Router>
       <AppContext.Provider value={{ items, setCartOpened }}>
@@ -150,6 +157,7 @@ function App() {
             opened={cartOpened}
           />
           <Header onClickCart={handleOpenDrawen} />
+          <Slider slides={slides} />
           <Routes>
             <Route
               path="/"
