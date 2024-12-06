@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
-import Drawer from "./components/Drawer";
+import Drawer from "./components/Drawen/Drawer";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
+import Orders from "./pages/Orders";
 import AppContext from "./context";
 
 import axios from "axios";
@@ -141,14 +142,13 @@ function App() {
     <Router>
       <AppContext.Provider value={{ items, setCartOpened }}>
         <div className="wrapper clear">
-          {cartOpened && (
-            <Drawer
-              handleOrder={handleClearCartStatus}
-              onClose={handleCloseDrawen}
-              items={items}
-              onDelete={handleDeleteFromCart}
-            />
-          )}
+          <Drawer
+            handleOrder={handleClearCartStatus}
+            onClose={handleCloseDrawen}
+            items={items}
+            onDelete={handleDeleteFromCart}
+            opened={cartOpened}
+          />
           <Header onClickCart={handleOpenDrawen} />
           <Routes>
             <Route
@@ -169,6 +169,16 @@ function App() {
               path="/favorites"
               element={
                 <Favorites
+                  onAddFavorite={handleFavorite}
+                  onAddToCart={handleAddOnCart}
+                />
+              }
+              exact
+            />
+            <Route
+              path="/orders"
+              element={
+                <Orders
                   onAddFavorite={handleFavorite}
                   onAddToCart={handleAddOnCart}
                 />

@@ -1,10 +1,12 @@
 import { useContext, useState } from "react";
-import AppContext from "../context";
-import Info from "./Info";
+import AppContext from "../../context";
+import Info from "../Info";
 import axios from "axios";
 
+import styles from "./Drawer.module.scss";
+
 // eslint-disable-next-line react/prop-types
-export default function Drawer({ onClose, onDelete, handleOrder }) {
+export default function Drawer({ onClose, onDelete, handleOrder, opened }) {
   const { items } = useContext(AppContext);
 
   const [orderComplete, setOrderComplete] = useState(false);
@@ -36,8 +38,10 @@ export default function Drawer({ onClose, onDelete, handleOrder }) {
     .reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <div className="overlay">
-      <div className="drawer">
+    <div
+      className={`${styles.overlay} ${opened ? styles.overlayVisible : ""} `}
+    >
+      <div className={styles.drawer}>
         {items.filter((item) => item.isOnCart).length > 0 ? (
           <>
             <h2 className="d-flex justify-between mb-30 ">
