@@ -6,8 +6,9 @@ import Header from "./components/Header";
 import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
 import Orders from "./pages/Orders";
-import AppContext from "./context";
 import Slider from "./components/Slider";
+
+import AppContext from "./context";
 
 import axios from "axios";
 
@@ -40,8 +41,6 @@ function App() {
 
   // Добавление в корзину
   async function handleAddOnCart(obj) {
-    console.log("Объект для изменения:", obj);
-
     // Локальное обновление состояния items
     setItems((prev) =>
       prev.map((item) =>
@@ -51,11 +50,10 @@ function App() {
 
     // Синхронизация с MockAPI
     try {
-      const response = await axios.put(
+      await axios.put(
         `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
         { isOnCart: !obj.isOnCart } // Переключение статуса
       );
-      console.log("Обновление на сервере успешно:", response.data);
     } catch (error) {
       console.error("Ошибка синхронизации с сервером:", error);
     }
@@ -63,7 +61,6 @@ function App() {
 
   //Добавление в избранное
   async function handleFavorite(obj) {
-    console.log("Объект для изменения:", obj);
 
     // Локальное обновление состояния items
     setItems((prev) =>
@@ -74,11 +71,10 @@ function App() {
 
     // Синхронизация с MockAPI
     try {
-      const response = await axios.put(
+      await axios.put(
         `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
         { isFavorite: !obj.isFavorite } // Переключение статуса
       );
-      console.log("Обновление на сервере успешно:", response.data);
     } catch (error) {
       console.error("Ошибка синхронизации с сервером:", error);
     }
@@ -86,8 +82,6 @@ function App() {
 
   // удаление из корзины
   async function handleDeleteFromCart(obj) {
-    console.log("Объект для удаления из корзины:", obj);
-
     // Локальное обновление состояния items
     setItems((prev) =>
       prev.map((item) =>
@@ -97,41 +91,12 @@ function App() {
 
     // Синхронизация с MockAPI
     try {
-      const response = await axios.put(
+      await axios.put(
         `https://6750184969dc1669ec19a427.mockapi.io/Items/${obj.id}`,
         { isOnCart: !obj.isOnCart } // Переключение статуса
       );
-      console.log("Обновление на сервере успешно:", response.data);
     } catch (error) {
       console.error("Ошибка синхронизации с сервером:", error);
-    }
-  }
-
-  async function handleClearCartStatus() {
-    // Локально обновляем состояние items
-    setItems((prev) =>
-      prev.map((item) => ({
-        ...item,
-        isOnCart: false, // Сбрасываем параметр
-      }))
-    );
-
-    try {
-      // Обновляем данные на сервере для всех объектов
-      const promises = items.map((item) =>
-        axios.put(
-          `https://6750184969dc1669ec19a427.mockapi.io/Items/${item.id}`,
-          {
-            isOnCart: false, // Сбрасываем параметр
-          }
-        )
-      );
-
-      // Ждем завершения всех запросов
-      await Promise.all(promises);
-      console.log("Все объекты обновлены успешно!");
-    } catch (error) {
-      console.error("Ошибка при обновлении данных на сервере:", error);
     }
   }
 
@@ -140,17 +105,28 @@ function App() {
   }
 
   const slides = [
-    { title: "Stan Smith", descr: "Описание для Stan Smith" },
-    { title: "Kermit", descr: "Описание для Kermit" },
-    { title: "Huina", descr: "Описание для Huina" },
+    {
+      title: "Шагай уверенно — будь в тренде!",
+      descr: "Открой для себя стильные кроссовки для повседневности и спорта.",
+      imgUrl: "/img/slider-1.jpeg",
+    },
+    {
+      title: "Каждый шаг — шаг к комфорту!",
+      descr: "Кроссовки, которые дарят свободу движения и стиль каждый день.",
+      imgUrl: "/img/slider-2.jpeg",
+    },
+    {
+      title: "Быстрее. Легче. Ярче.",
+      descr: "Твой идеальный выбор кроссовок для активной жизни и новых побед.",
+      imgUrl: "/img/slider-3.jpeg",
+    },
   ];
 
   return (
     <Router>
-      <AppContext.Provider value={{ items, setCartOpened }}>
+      <AppContext.Provider value={{ items, setCartOpened, setItems }}>
         <div className="wrapper clear">
           <Drawer
-            handleOrder={handleClearCartStatus}
             onClose={handleCloseDrawen}
             items={items}
             onDelete={handleDeleteFromCart}

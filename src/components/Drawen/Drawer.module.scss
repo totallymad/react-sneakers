@@ -9,6 +9,8 @@
     visibility: hidden;
     overflow: hidden;
     transition: visibility .3s ease-in-out;
+    z-index: 100;
+
 }
 
 .overlayVisible {
@@ -20,6 +22,7 @@
 }
 
 .drawer {
+    z-index: 100;
     display: flex;
     flex-direction: column;
     padding: 30px;

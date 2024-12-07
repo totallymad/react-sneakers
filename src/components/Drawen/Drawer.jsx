@@ -6,8 +6,8 @@ import axios from "axios";
 import styles from "./Drawer.module.scss";
 
 // eslint-disable-next-line react/prop-types
-export default function Drawer({ onClose, onDelete, handleOrder, opened }) {
-  const { items } = useContext(AppContext);
+export default function Drawer({ onClose, onDelete, opened }) {
+  const { items, setItems } = useContext(AppContext);
 
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
@@ -18,18 +18,33 @@ export default function Drawer({ onClose, onDelete, handleOrder, opened }) {
     setOrderComplete(true);
     setIsLoading(true);
 
+    function delay(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
     try {
       const response = await axios.post(
-        "https://6750184969dc1669ec19a427.mockapi.io/orders", // Создаем новый заказ
-        { items: orderedItems } // Отправляем массив товаров как часть заказа
+        "https://6750184969dc1669ec19a427.mockapi.io/orders",
+        { items: orderedItems }
       );
+      setOrderId(response.data.id);
 
-      console.log("Заказ успешно отправлен:", response.data);
-      setOrderId(response.data.id); // Сохраняем ID заказа
+      for (const item of orderedItems) {
+        await axios.put(
+          `https://6750184969dc1669ec19a427.mockapi.io/Items/${item.id}`,
+          { isOnCart: false }
+        );
+        await delay(200);
+      }
+
+      const res = await axios.get(
+        "https://6750184969dc1669ec19a427.mockapi.io/Items"
+      );
+      setItems(res.data);
     } catch (error) {
-      console.log("Ошибка при отрпавке заказа на сервер", error);
+      console.error("Ошибка при отправке заказа или очистке корзины", error);
     } finally {
-      setIsLoading(false); // Скрываем спиннер
+      setIsLoading(false);
     }
   }
 
@@ -44,7 +59,7 @@ export default function Drawer({ onClose, onDelete, handleOrder, opened }) {
       <div className={styles.drawer}>
         {items.filter((item) => item.isOnCart).length > 0 ? (
           <>
-            <h2 className="d-flex justify-between mb-30 ">
+            <h2 className="d-flex justify-between mb-30">
               Корзина
               <img
                 onClick={onClose}
@@ -57,30 +72,29 @@ export default function Drawer({ onClose, onDelete, handleOrder, opened }) {
             <div className="items flex">
               {items
                 .filter((item) => item.isOnCart)
-                .map((item) => {
-                  return (
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="cartItem d-flex align-center mb-20"
+                  >
                     <div
-                      key={item.id}
-                      className="cartItem d-flex align-center mb-20"
-                    >
-                      <div
-                        style={{ backgroundImage: `url(${item.imgUrl})` }}
-                        className="cartItemImg"
-                      ></div>
-                      <div className="mr-20 flex">
-                        <p className="mb-5">{item.name}</p>
-                        <b>{item.price} руб.</b>
-                      </div>
-                      <img
-                        onClick={() => onDelete(item)}
-                        className="removeBtn"
-                        src="/img/btn-remove.svg"
-                        alt="remove"
-                      />
+                      style={{ backgroundImage: `url(${item.imgUrl})` }}
+                      className="cartItemImg"
+                    ></div>
+                    <div className="mr-20 flex">
+                      <p className="mb-5">{item.name}</p>
+                      <b>{item.price} руб.</b>
                     </div>
-                  );
-                })}
+                    <img
+                      onClick={() => onDelete(item)}
+                      className="removeBtn"
+                      src="/img/btn-remove.svg"
+                      alt="remove"
+                    />
+                  </div>
+                ))}
             </div>
+
             <div className="cartTotalBlock">
               <ul>
                 <li>
@@ -95,40 +109,26 @@ export default function Drawer({ onClose, onDelete, handleOrder, opened }) {
                 </li>
               </ul>
               <button
-                onClick={() => {
-                  handleOrder();
-                  handleOrderSet();
-                }}
-                className="greenButton"
+                onClick={handleOrderSet}
+                className="button button-full"
+                disabled={isLoading}
               >
-                Оформить заказ <img src="/img/arrow.svg" alt="arrow" />
+                {isLoading ? "Оформляем заказ..." : "Оформить заказ"}
+                <img src="/img/arrow.svg" alt="arrow" />
               </button>
             </div>
           </>
         ) : (
           <Info
-            title={
-              isLoading
-                ? "Оформляем заказ..."
-                : orderComplete
-                ? "Заказ оформлен!"
-                : "Корзина пустая"
-            }
+            title={orderComplete ? "Заказ оформлен!" : "Корзина пустая"}
             descr={
-              isLoading
-                ? "Пожалуйста, подождите. Мы оформляем ваш заказ."
-                : orderComplete
+              orderComplete
                 ? `Ваш заказ #${orderId} скоро будет передан курьерской доставке`
                 : "Добавьте хотя бы одну пару кроссовок, чтобы сделать заказ."
             }
-            img={
-              isLoading
-                ? "/img/spinner.gif"
-                : orderComplete
-                ? "/img/order.png"
-                : "/img/cart.png"
-            }
-            alt={isLoading ? "loading" : orderComplete ? "order" : "empty cart"}
+            img={orderComplete ? "/img/order.png" : "/img/cart.png"}
+            alt={orderComplete ? "order" : "empty cart"}
+            type="drawen"
           />
         )}
       </div>

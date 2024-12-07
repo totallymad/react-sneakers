@@ -18,7 +18,7 @@ export default function Home({
       item.name.toLowerCase().includes(searchValue.toLowerCase())
     );
     return isLoading
-      ? [...Array(8)].map((_, index) => <Card key={index} isLoading={true} />)
+      ? [...Array(12)].map((_, index) => <Card key={index} isLoading={true} />)
       : filteredItems.map((card) => (
           <Card
             key={card.id}

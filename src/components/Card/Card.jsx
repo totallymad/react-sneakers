@@ -14,20 +14,14 @@ export default function Card({
   isFavorite,
   isOnCart,
   isLoading,
+  type,
 }) {
-  // const [isAdded, setIsAdded] = useState(isOnCart);
-  // const [isFavorite, setIsFavorite] = useState(favorited);
-
   async function handleClickPlus() {
-    // Передаем объект для обработки
     await onClick({ id, name, price, imgUrl, isOnCart });
   }
 
   async function handleFavorite() {
-    // Передаем объект для обработки
     await onFavorite({ id, name, price, imgUrl, isFavorite });
-    // Локальное переключение состояния
-    // setIsFavorite((prev) => !prev);
   }
 
   return (
@@ -50,13 +44,15 @@ export default function Card({
       ) : (
         <>
           <div className={styles.favorite}>
-            <img
-              onClick={handleFavorite}
-              src={
-                isFavorite ? "/img/heart-liked.svg" : "/img/heart-unliked.svg"
-              }
-              alt={isFavorite ? "liked" : "unliked"}
-            />
+            {type ? null : (
+              <img
+                onClick={handleFavorite}
+                src={
+                  isFavorite ? "/img/heart-liked.svg" : "/img/heart-unliked.svg"
+                }
+                alt={isFavorite ? "liked" : "unliked"}
+              />
+            )}
           </div>
           <img width={133} height={112} src={imgUrl} alt="sneakers" />
           <h5>{name}</h5>
@@ -65,12 +61,14 @@ export default function Card({
               <span>Цена:</span>
               <b>{price} руб.</b>
             </div>
-            <img
-              className={styles.plus}
-              onClick={handleClickPlus}
-              src={!isOnCart ? "/img/btn-plus.svg" : "/img/btn-checked.svg"}
-              alt={isOnCart ? "checked" : "plus"}
-            />
+            {type ? null : (
+              <img
+                className={styles.plus}
+                onClick={handleClickPlus}
+                src={!isOnCart ? "/img/btn-plus.svg" : "/img/btn-checked.svg"}
+                alt={isOnCart ? "checked" : "plus"}
+              />
+            )}
           </div>
         </>
       )}

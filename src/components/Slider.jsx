@@ -1,39 +1,38 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
-import Slide from "./Slide";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules"; 
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
-const Slider = ({ slides }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
-    );
-  };
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === slides.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
+export default function Slider({ slides }) {
   return (
-    <div className="slider">
-      <button className="slider-btn prev" onClick={prevSlide}>
-        ❮
-      </button>
-      <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-        {slides.map((slide, index) =>
-          index === currentIndex ? (
-            <Slide key={index} title={slide.title} descr={slide.descr} />
-          ) : null
-        )}
-      </div>
-      <button className="slider-btn next" onClick={nextSlide}>
-        ❯
-      </button>
-    </div>
-  );
-};
+    <Swiper
+      modules={[Navigation, Pagination]}
+      spaceBetween={50}
+      slidesPerView={1}
+      navigation={{
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      }}
+      loop={true}
+    >
+      {slides.map((slide, index) => (
+        <SwiperSlide key={index}>
+          <div
+            className="slide mt-30"
+            style={{ backgroundImage: `url(${slide.imgUrl})` }}
+          >
+            <div className="slide-content">
+              <h3 className="slide-title">{slide.title}</h3>
+              <p className="slide-descr">{slide.descr}</p>
+            </div>
+          </div>
+        </SwiperSlide>
+      ))}
 
-export default Slider;
+      <div className="swiper-button-prev"></div>
+      <div className="swiper-button-next"></div>
+    </Swiper>
+  );
+}
