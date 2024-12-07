@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import useTotalPrice from "../hooks/useTotalPrice";
+import { useTotalPrice } from "../hooks/UseTotalPrice.jsx";
 
 // eslint-disable-next-line react/prop-types
 export default function Header({ onClickCart }) {
